@@ -1,6 +1,7 @@
 import Head from "next/head";
+import { connect } from "getstream";
 
-export default function Home() {
+export default function Home({ token }: { token: string }) {
   return (
     <>
       <Head>
@@ -14,4 +15,19 @@ export default function Home() {
       </main>
     </>
   );
+}
+
+export async function getServerSideProps() {
+  const client = connect(
+    "x2u4y9padhyg",
+    "a3jgbre8tjq5j3q3twzw72rce3xgm72p2szuq422j3kffzbe4yh7ksspsqz4kwh3"
+  );
+
+  const token = await client.createUserToken("emanatelive");
+
+  return {
+    props: {
+      token,
+    },
+  };
 }
