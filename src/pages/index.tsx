@@ -1,7 +1,11 @@
 import Head from "next/head";
 import { connect } from "getstream";
+import { useUser } from "@/stores/user";
+import { API_KEY, APP_SECRET } from "@/config/constants";
 
 export default function Home({ token }: { token: string }) {
+  const { user } = useUser();
+
   return (
     <>
       <Head>
@@ -10,18 +14,18 @@ export default function Home({ token }: { token: string }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <h1 className="text-3xl font-bold underline">Hello world!</h1>
+      <main className="h-full flex items-center justify-center w-full flex-col">
+        <div className="flex items-center">
+          <button className="btn btn-primary mr-5">Follow</button>
+          Emanate
+        </div>
       </main>
     </>
   );
 }
 
 export async function getServerSideProps() {
-  const client = connect(
-    "x2u4y9padhyg",
-    "a3jgbre8tjq5j3q3twzw72rce3xgm72p2szuq422j3kffzbe4yh7ksspsqz4kwh3"
-  );
+  const client = connect(API_KEY, APP_SECRET);
 
   const token = await client.createUserToken("emanatelive");
 
