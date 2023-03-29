@@ -8,7 +8,9 @@ export type User = {
 
 export type UserStore = {
   user: User;
+  token: string | null;
   switchUser: () => void;
+  setToken: (token: string) => void;
 };
 
 const users: User[] = [
@@ -26,11 +28,16 @@ const users: User[] = [
 
 const userStore = create<UserStore>((set) => ({
   user: users[0],
+  token: null,
   switchUser: () =>
-    set((state: any) => {
+    set((state) => {
       const currentIndex = users.findIndex((e) => e.id == state.user.id);
       const newIndex: number = currentIndex === 0 ? 1 : 0;
       return { user: users[newIndex] };
+    }),
+  setToken: (token: string) =>
+    set((state) => {
+      return { token: token };
     }),
 }));
 

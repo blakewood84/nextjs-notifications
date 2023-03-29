@@ -1,17 +1,44 @@
 "use client";
 
+import { API_KEY } from "@/config/constants";
 import { useUser } from "@/stores/user";
+import { connect, DefaultGenerics, NewActivity, StreamClient } from "getstream";
 import { useEffect, useState } from "react";
 
 export function Notifications() {
-  const { user } = useUser();
+  const { user, token } = useUser();
   const [notificationCount, setNotificationCount] = useState<number>(0);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (token !== null) handleFetchNotifications();
+    return () => {
+      console.log("Unmount");
+    };
+  }, [token]);
+
+  const handleFetchNotifications = async () => {
+    const client = connect(API_KEY, null, "12491926");
+
+    const eric = client.feed("notification", "eric", token ?? "");
+
+    // This should be a stream
+    const notifications = await eric.get({ limit: 20 });
+    console.log("notifications: ", notifications);
+    setNotificationCount(notifications.unseen ?? 0);
+
+    // Unseen is the badge icon
+    // Unread is a highlight over each individual activity
+  };
 
   return (
     <div className="dropdown dropdown-end">
-      <button className="btn btn-ghost btn-circle" tabIndex={0}>
+      <button
+        className="btn btn-ghost btn-circle"
+        tabIndex={0}
+        onClick={() => {
+          // Mark all as seen
+        }}
+      >
         <div className="indicator">
           <svg
             xmlns="http://www.w3.org/2000/svg"
