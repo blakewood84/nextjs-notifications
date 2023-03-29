@@ -22,9 +22,21 @@ export function Notifications() {
     const eric = client.feed("notification", "eric", token ?? "");
 
     // This should be a stream
-    const notifications = await eric.get({ limit: 20 });
-    console.log("notifications: ", notifications);
+    const notifications = await await eric.get({ limit: 20 });
     setNotificationCount(notifications.unseen ?? 0);
+
+    const list = notifications.results;
+    let notificationList = [];
+
+    for (const action of list) {
+      let activities = [];
+
+      console.log("action: ", action);
+      for (const activity of action.activities as any[]) {
+        const verb = activity.verb + "ed";
+        const note = { ...activity, verb };
+      }
+    }
 
     // Unseen is the badge icon
     // Unread is a highlight over each individual activity
