@@ -5,7 +5,7 @@ const users: User[] = [
   {
     image: "https://picsum.photos/id/30/200/300",
     name: "Emanate",
-    id: "emanatelive",
+    id: "emanate-live",
   },
   {
     image: "https://picsum.photos/id/237/200/300",

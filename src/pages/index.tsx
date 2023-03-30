@@ -32,7 +32,7 @@ export default function Home({ token }: { token: string }) {
 export async function getServerSideProps() {
   const client = connect(API_KEY, APP_SECRET);
 
-  const token = await client.createUserToken("eric");
+  const token = await client.createUserToken("emanate-live");
 
   return {
     props: {

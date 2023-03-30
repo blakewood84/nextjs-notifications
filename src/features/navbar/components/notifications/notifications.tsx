@@ -2,12 +2,14 @@
 
 import { API_KEY } from "@/config/constants";
 import { useUser } from "@/stores/user";
-import { connect, DefaultGenerics, NewActivity, StreamClient } from "getstream";
+import { connect } from "getstream";
 import { useEffect, useState } from "react";
+import { NotificationsDropdown } from "../notifications_dropdown";
 
 export function Notifications() {
   const { user, token } = useUser();
   const [notificationCount, setNotificationCount] = useState<number>(0);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (token !== null) handleFetchNotifications();
@@ -16,30 +18,35 @@ export function Notifications() {
     };
   }, [token]);
 
+  // When loading check notifications count
+  // Then subscribe, any new event on subscribe will force a new get on notifications
+
   const handleFetchNotifications = async () => {
-    const client = connect(API_KEY, null, "12491926");
+    const client = connect(API_KEY, null, "1241926");
 
-    const eric = client.feed("notification", "eric", token ?? "");
+    const notificationsFeed = client.feed(
+      "notification",
+      "emanate-live",
+      token ?? ""
+    );
 
-    // This should be a stream
-    const notifications = await await eric.get({ limit: 20 });
-    setNotificationCount(notifications.unseen ?? 0);
+    const initialCount = (await notificationsFeed.get()).unseen ?? 0;
 
-    const list = notifications.results;
-    let notificationList = [];
+    setNotificationCount(initialCount);
 
-    for (const action of list) {
-      let activities = [];
-
-      console.log("action: ", action);
-      for (const activity of action.activities as any[]) {
-        const verb = activity.verb + "ed";
-        const note = { ...activity, verb };
-      }
-    }
-
-    // Unseen is the badge icon
-    // Unread is a highlight over each individual activity
+    notificationsFeed
+      .subscribe(async (snapshot) => {
+        const unseen = (await notificationsFeed.get()).unseen ?? 0;
+        setNotificationCount(unseen);
+      })
+      .then(
+        () => {
+          console.log("Subscribed!");
+        },
+        (data) => {
+          console.log("something went wrong: ", data);
+        }
+      );
   };
 
   return (
@@ -49,6 +56,7 @@ export function Notifications() {
         tabIndex={0}
         onClick={() => {
           // Mark all as seen
+          setIsOpen(!isOpen);
         }}
       >
         <div className="indicator">
@@ -73,11 +81,7 @@ export function Notifications() {
           )}
         </div>
       </button>
-      <div className="dropdown-content bg-base-200 text-base-content rounded-b-box top-px max-h-96 h-[70vh] w-52 overflow-y-auto shadow-2xl mt-16">
-        <div tabIndex={0}>
-          <button className="btn">Hello World</button>
-        </div>
-      </div>
+      {isOpen && <NotificationsDropdown />}
     </div>
   );
 }
