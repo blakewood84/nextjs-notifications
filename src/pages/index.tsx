@@ -3,6 +3,7 @@ import { connect } from "getstream";
 import { useUser } from "@/stores/user";
 import { API_KEY, APP_SECRET } from "@/config/constants";
 import { useEffect } from "react";
+import { FollowButton } from "@/components/follow_button";
 
 export default function Home({ token }: { token: string }) {
   const { setToken } = useUser();
@@ -20,10 +21,7 @@ export default function Home({ token }: { token: string }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="h-full flex items-center justify-center w-full flex-col bg-slate-900">
-        <div className="flex items-center">
-          <button className="btn btn-primary mr-5">Follow</button>
-          Emanate
-        </div>
+        <FollowButton />
       </main>
     </>
   );
