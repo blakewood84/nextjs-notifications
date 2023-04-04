@@ -7,9 +7,11 @@ import { useEffect, useState } from "react";
 import { NotificationsDropdown } from "../notifications_dropdown";
 
 export function Notifications() {
-  const { user, token } = useUser();
+  const { token } = useUser();
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const client = connect(API_KEY, null, "1241926");
 
   useEffect(() => {
     if (token !== null) handleFetchNotifications();
@@ -22,8 +24,6 @@ export function Notifications() {
   // Then subscribe, any new event on subscribe will force a new get on notifications
 
   const handleFetchNotifications = async () => {
-    const client = connect(API_KEY, null, "1241926");
-
     const notificationsFeed = client.feed(
       "notification",
       "emanate-live",
@@ -36,6 +36,7 @@ export function Notifications() {
 
     notificationsFeed
       .subscribe(async (snapshot) => {
+        console.log("new snapshot: ", snapshot);
         const unseen = (await notificationsFeed.get()).unseen ?? 0;
         setNotificationCount(unseen);
       })
@@ -49,6 +50,18 @@ export function Notifications() {
       );
   };
 
+  // Set's all notifications as seen
+  const handleSetAsSeen = async () => {
+    console.log("marking as seen");
+    const notificationsFeed = await client
+      .feed("notification", "emanate-live", token ?? "")
+      .get({ mark_seen: true });
+
+    setNotificationCount(0);
+
+    console.log("marked as seen");
+  };
+
   return (
     <div className="dropdown dropdown-end">
       <button
@@ -57,6 +70,7 @@ export function Notifications() {
         onClick={() => {
           // Mark all as seen
           setIsOpen(!isOpen);
+          handleSetAsSeen();
         }}
       >
         <div className="indicator">
@@ -81,7 +95,9 @@ export function Notifications() {
           )}
         </div>
       </button>
-      {isOpen && <NotificationsDropdown />}
+      {isOpen && (
+        <NotificationsDropdown closeCallback={() => setIsOpen(false)} />
+      )}
     </div>
   );
 }

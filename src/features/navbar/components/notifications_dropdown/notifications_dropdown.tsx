@@ -7,7 +7,11 @@ import { connect } from "getstream";
 import { useEffect, useState } from "react";
 import { FollowNotification, LikedNotification } from "../notification_types";
 
-export function NotificationsDropdown() {
+export function NotificationsDropdown({
+  closeCallback,
+}: {
+  closeCallback: () => void;
+}) {
   const { token, user } = useUser();
   const [notifications, setNotifications] = useState<any[] | null>(null);
 
@@ -33,16 +37,14 @@ export function NotificationsDropdown() {
     for (const event of response.results) {
       const result = { ...event } as any;
       const isSeen = result.is_seen as boolean;
+      const isRead = result.is_read as boolean;
       const groupId = result.id as string;
 
       for (const activity of event.activities as any[]) {
-        list.push({ ...activity, isSeen, groupId });
+        list.push({ ...activity, isSeen, isRead, groupId });
       }
     }
 
-    // await setTimeout(() => {
-    //   setNotifications(list);
-    // }, 1000);
     setNotifications(list);
   };
 
@@ -62,6 +64,7 @@ export function NotificationsDropdown() {
                   <FollowNotification
                     notification={notification}
                     userId={user.id}
+                    closeCallback={closeCallback}
                   />
                 );
               }
