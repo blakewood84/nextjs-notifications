@@ -1,7 +1,7 @@
 import { User, UserStore } from "./types";
 import { create, useStore } from "zustand";
 
-const users: User[] = [
+export const users: User[] = [
   {
     image: "https://picsum.photos/id/30/200/300",
     name: "Emanate",
