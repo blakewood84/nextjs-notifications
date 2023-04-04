@@ -17,15 +17,16 @@ const users: User[] = [
 const userStore = create<UserStore>((set) => ({
   user: users[0],
   token: null,
+  otherToken: null,
   switchUser: () =>
     set((state) => {
       const currentIndex = users.findIndex((e) => e.id == state.user.id);
       const newIndex: number = currentIndex === 0 ? 1 : 0;
       return { user: users[newIndex] };
     }),
-  setToken: (token: string) =>
+  setToken: (token: string, otherToken: string) =>
     set((state) => {
-      return { token: token };
+      return { token: token, otherToken: otherToken };
     }),
 }));
 

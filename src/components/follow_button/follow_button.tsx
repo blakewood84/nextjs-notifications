@@ -1,39 +1,39 @@
 "use client";
 
-import { API_KEY } from "@/config/constants";
+import { API_KEY, APP_SECRET } from "@/config/constants";
 import { useUser } from "@/stores/user";
 import { connect } from "getstream";
 import { useEffect, useRef } from "react";
 
 export function FollowButton() {
-  const { token } = useUser();
-  const client = connect(API_KEY, null, "1241926");
-  const idRef = useRef(2);
+  const { otherToken } = useUser();
 
   useEffect(() => {
-    if (token !== null) {
+    if (otherToken !== null) {
     }
-  }, [token]);
+  }, [otherToken]);
 
   const handleFollow = async () => {
-    console.log("following emanate");
-    const feed = client.feed("notification", "emanate-live", token ?? "");
-
-    const mau5trap = client.user("mau5trap");
-    const emanate = client.user("emanate-live");
+    console.log("token: ", otherToken);
+    // const feed = client.feed("user", "chris", token!);
+    const client = connect(API_KEY, otherToken, "1241926");
+    const feed = client.feed("notification", "emanate-live");
 
     const activity = {
-      actor: mau5trap,
-      verb: "Followed " + mau5trap.id,
-      object: emanate,
-      foreign_id: mau5trap.id + `:${idRef.current}`,
+      actor: client.currentUser!,
+      verb: "Followed " + "mau5trap",
+      object: client.user("emanate-live"),
+      foreign_id: "mau5trap" + `:1`,
     };
 
-    idRef.current += 1;
+    // idRef.current += 1;
 
-    await feed.addActivity(activity);
-
-    console.log("activity updated!");
+    try {
+      await feed.addActivity(activity);
+      console.log("activity updated!");
+    } catch (error) {
+      console.log("error: ", error);
+    }
   };
 
   return (
@@ -41,4 +41,14 @@ export function FollowButton() {
       Follow
     </button>
   );
+}
+
+async function getServerSideProps() {
+  const client = connect(API_KEY, APP_SECRET);
+
+  const token = await client.createUserToken("emanate-live");
+
+  return {
+    otherToken: token,
+  };
 }

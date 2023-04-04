@@ -5,11 +5,17 @@ import { API_KEY, APP_SECRET } from "@/config/constants";
 import { useEffect } from "react";
 import { FollowButton } from "@/components/follow_button";
 
-export default function Home({ token }: { token: string }) {
+export default function Home({
+  token,
+  otherToken,
+}: {
+  token: string;
+  otherToken: string;
+}) {
   const { setToken } = useUser();
 
   useEffect(() => {
-    setToken(token);
+    setToken(token, otherToken);
   }, []);
 
   return (
@@ -31,10 +37,12 @@ export async function getServerSideProps() {
   const client = connect(API_KEY, APP_SECRET);
 
   const token = await client.createUserToken("emanate-live");
+  const otherToken = await client.createUserToken("mau5trap");
 
   return {
     props: {
       token,
+      otherToken,
     },
   };
 }

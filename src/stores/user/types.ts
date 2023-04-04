@@ -7,6 +7,7 @@ export type User = {
 export type UserStore = {
   user: User;
   token: string | null;
+  otherToken: string | null;
   switchUser: () => void;
-  setToken: (token: string) => void;
+  setToken: (token: string, otherToken: string) => void;
 };
